@@ -3,16 +3,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: sonarr-mcp-server
+    container_name: sonarr-mcp
+    labels:
+      - com.centurylinklabs.watchtower.enable=false
     restart: unless-stopped
     ports:
       - "${SONARR_MCP_PORT:-9171}:9171"
     env_file:
       - .env
     volumes:
-      - ./logs:/app/logs
+      - /mnt/cache/appdata/sonarr-mcp/logs:/app/logs
     networks:
-      - sonarr-mcp-network
+      - jakenet
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9171/mcp"]
       interval: 30s
@@ -21,5 +23,6 @@ services:
       start_period: 40s
 
 networks:
-  sonarr-mcp-network:
-    driver: bridge
+  jakenet:
+    external: true
+

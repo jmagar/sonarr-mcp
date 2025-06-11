@@ -67,6 +67,17 @@ SONARR_URL = os.getenv('SONARR_URL').rstrip('/')
 SONARR_API_KEY = os.getenv('SONARR_API_KEY')
 API_BASE = f"{SONARR_URL}/api/v3"
 
+# Global session for aiohttp
+session: Optional[aiohttp.ClientSession] = None
+
+async def get_session() -> aiohttp.ClientSession:
+    """Get or create aiohttp session."""
+    global session
+    if session is None or session.closed:
+        session = aiohttp.ClientSession()
+        logger.info("Created new aiohttp.ClientSession for Sonarr MCP.")
+    return session
+
 # Initialize server
 mcp = FastMCP(
     name="Sonarr MCP Server",
@@ -80,25 +91,19 @@ async def make_api_request(endpoint: str, method: str = "GET", data: Optional[Di
         "X-Api-Key": SONARR_API_KEY,
         "Content-Type": "application/json"
     }
-    
+
+    logger.debug(f"Making Sonarr API request: {method} {url}")
+    client_session = await get_session()
     try:
-        async with aiohttp.ClientSession() as session:
-            if method.upper() == "GET":
-                async with session.get(url, headers=headers) as response:
-                    response.raise_for_status()
-                    return await response.json()
-            elif method.upper() == "POST":
-                async with session.post(url, headers=headers, json=data) as response:
-                    response.raise_for_status()
-                    return await response.json()
-            elif method.upper() == "PUT":
-                async with session.put(url, headers=headers, json=data) as response:
-                    response.raise_for_status()
-                    return await response.json()
-            elif method.upper() == "DELETE":
-                async with session.delete(url, headers=headers) as response:
-                    response.raise_for_status()
-                    return {"status": "deleted"}
+        async with client_session.request(method.upper(), url, json=data, headers=headers) as response:
+            response.raise_for_status()
+            # For DELETE, Sonarr might return 200 OK with no body, or other success codes.
+            # aiohttp's .json() will fail on empty body.
+            if response.status in (200, 202, 204) and method.upper() == 'DELETE':
+                return {"status": "success", "message": "Delete command sent successfully."}
+            if response.status == 204: # No Content
+                return {"status": "success", "message": "Request successful with no content."}
+            return await response.json()
     except aiohttp.ClientError as e:
         logger.error(f"API request failed: {e}")
         raise Exception(f"Sonarr API request failed: {str(e)}")
