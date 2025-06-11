@@ -13,38 +13,13 @@ services:
       - ./logs:/app/logs
     networks:
       - sonarr-mcp-network
-    depends_on:
-      - sonarr
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9171/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:9171/mcp"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
 
-  sonarr:
-    image: lscr.io/linuxserver/sonarr:latest
-    container_name: sonarr
-    environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Etc/UTC
-    volumes:
-      - ./sonarr-config:/config
-      - ./tv:/tv
-      - ./downloads:/downloads
-    ports:
-      - "8989:8989"
-    restart: unless-stopped
-    networks:
-      - sonarr-mcp-network
-
 networks:
   sonarr-mcp-network:
     driver: bridge
-
-volumes:
-  sonarr-config:
-  tv:
-  downloads:
-  logs: 

@@ -14,7 +14,7 @@ if [ -z "$SONARR_API_KEY" ]; then
 fi
 
 echo "Sonarr URL: $SONARR_URL"
-echo "MCP Server will listen on: ${SONARR_MCP_HOST:-127.0.0.1}:${SONARR_MCP_PORT:-4200}"
+echo "MCP Server will listen on: ${SONARR_MCP_HOST:-127.0.0.1}:${SONARR_MCP_PORT:-9171}"
 
 # Test Sonarr connectivity
 echo "Testing Sonarr connectivity..."

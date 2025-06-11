@@ -54,7 +54,7 @@ logger.info(f"Logging initialized (console and file: {log_file_path}).")
 # Log loaded environment variables
 logger.info(f"SONARR_URL loaded: {os.getenv('SONARR_URL', 'Not Found')[:20]}...")
 logger.info(f"SONARR_API_KEY loaded: {'****' if os.getenv('SONARR_API_KEY') else 'Not Found'}")
-logger.info(f"SONARR_MCP_PORT set to: {os.getenv('SONARR_MCP_PORT', '4200')}")
+logger.info(f"SONARR_MCP_PORT set to: {os.getenv('SONARR_MCP_PORT', '9171')}")
 logger.info(f"LOG_LEVEL set to: {os.getenv('LOG_LEVEL', 'INFO')}")
 
 # Critical check for essential API credentials/URL
@@ -659,7 +659,7 @@ if __name__ == "__main__":
     mcp.run(
         transport="streamable-http",
         host=os.getenv("SONARR_MCP_HOST", "127.0.0.1"),
-        port=int(os.getenv("SONARR_MCP_PORT", "4200")),
+        port=int(os.getenv("SONARR_MCP_PORT", "9171")),
         path="/mcp",
         log_level=os.getenv("SONARR_LOG_LEVEL", "debug"),
     ) 

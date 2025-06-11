@@ -61,7 +61,7 @@ Required environment variables:
 
 Optional configuration:
 - `SONARR_MCP_HOST` - Host to bind to (default: 127.0.0.1)
-- `SONARR_MCP_PORT` - Port to listen on (default: 4200)
+- `SONARR_MCP_PORT` - Port to listen on (default: 9171)
 - `LOG_LEVEL` - Logging level (default: INFO)
 
 ### Claude Desktop Configuration
@@ -97,7 +97,7 @@ In `cline_mcp_settings.json` (if running as HTTP server):
 {
   "mcpServers": {
     "sonarr-mcp-sse": {
-      "url": "http://localhost:4200/mcp",
+      "url": "http://localhost:9171/mcp",
       "disabled": false,
       "autoApprove": ["get_series_list", "get_calendar", "get_queue"],
       "timeout": 30
