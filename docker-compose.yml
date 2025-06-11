@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   sonarr-mcp:
     build:
@@ -8,14 +6,9 @@ services:
     container_name: sonarr-mcp-server
     restart: unless-stopped
     ports:
-      - "${SONARR_MCP_PORT:-4200}:4200"
-    environment:
-      - SONARR_URL=${SONARR_URL:-http://sonarr:8989}
-      - SONARR_API_KEY=${SONARR_API_KEY}
-      - SONARR_MCP_HOST=0.0.0.0
-      - SONARR_MCP_PORT=4200
-      - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - SONARR_LOG_LEVEL=${SONARR_LOG_LEVEL:-debug}
+      - "${SONARR_MCP_PORT:-9171}:9171"
+    env_file:
+      - .env
     volumes:
       - ./logs:/app/logs
     networks:
@@ -23,7 +16,7 @@ services:
     depends_on:
       - sonarr
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:4200/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:9171/health"]
       interval: 30s
       timeout: 10s
       retries: 3
