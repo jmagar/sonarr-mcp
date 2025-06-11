@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  sonarr-mcp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sonarr-mcp-server
+    restart: unless-stopped
+    ports:
+      - "${SONARR_MCP_PORT:-4200}:4200"
+    environment:
+      - SONARR_URL=${SONARR_URL:-http://sonarr:8989}
+      - SONARR_API_KEY=${SONARR_API_KEY}
+      - SONARR_MCP_HOST=0.0.0.0
+      - SONARR_MCP_PORT=4200
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - SONARR_LOG_LEVEL=${SONARR_LOG_LEVEL:-debug}
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - sonarr-mcp-network
+    depends_on:
+      - sonarr
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4200/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+    volumes:
+      - ./sonarr-config:/config
+      - ./tv:/tv
+      - ./downloads:/downloads
+    ports:
+      - "8989:8989"
+    restart: unless-stopped
+    networks:
+      - sonarr-mcp-network
+
+networks:
+  sonarr-mcp-network:
+    driver: bridge
+
+volumes:
+  sonarr-config:
+  tv:
+  downloads:
+  logs: 
